@@ -12,3 +12,13 @@ h1 {
 	text-decoration: underline overline;
 }
 
+.block {
+	border: 5px solid #000000;
+	padding: 4%;
+	background-color:#FFFFFF;
+}
+
+a {
+    color: #000000;
+    
+}
