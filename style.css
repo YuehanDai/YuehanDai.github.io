@@ -1,0 +1,14 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	width:70%;
+	margin:10%;
+	background-color: antiquewhite;
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+}
+
+h1 {
+	text-decoration: underline overline;
+}
+
