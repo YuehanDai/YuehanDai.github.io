@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+<head>
+	<title>Holiday</title>
+	<meta charset="utf-8"/>
+	<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"></script>
+	<script>
+
+		var dateValues;
+
+		function getHoliday() {
+			str = getDay();
+			/* Step 1: Make instance of request object...
+			...to make HTTP request after page is loaded*/
+			request = new XMLHttpRequest();
+			console.log("1 - request object created");
+ 
+			// Step 2: Set the URL for the AJAX request to be the JSON file
+ 
+		request.open("GET", str, true);
+
+			console.log("2 - opened request file");
+ 
+			// Step 3: set up event handler/callback
+
+			request.onreadystatechange = function() {
+				 
+				if (request.readyState == 4 && request.status == 200) {
+
+					// Step 5: wait for done + success
+					console.log("5 - response received");
+					result = request.responseText;
+					document.getElementById("data").innerHTML = result;
+
+					// console.log(JSON.parse(result));
+					dataValues = wrtiecalendar(JSON.parse(result));
+					
+				}
+				else if (request.readyState == 4 && request.status != 200) {
+
+					document.getElementById("data").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+
+				}
+
+				else if (request.readyState == 3) {
+
+					document.getElementById("data").innerHTML = "Too soon!  Try again";
+
+				}
+
+			}
+		// Step 4: fire off the HTTP request
+			request.send();
+			console.log("4 - Request sent");
+		}
+
+		function wrtiecalendar(calendar){
+			var days = [];
+			var day;
+				
+			const start = new Date("01/01/2019");
+			const end = new Date("12/31/2019");
+			let loop = new Date(start);
+			while (loop <= end) {
+			// console.log(loop);
+			day = {
+					date : "2019-" + (loop.getUTCMonth() + 1) + "-" + loop.getUTCDate(),
+					value : 0
+			}
+			days.push(day);
+			let newDate = loop.setDate(loop.getDate() + 1);
+			loop = new Date(newDate);
+			}
+			console.log(days);
+			return countHoliday(calendar, days);
+		}
+
+		function readDate(date){
+			var dateForm = new Date (date);
+			var stringDate = "2019-" + (dateForm.getUTCMonth() + 1) + "-" + dateForm.getUTCDate()
+			return stringDate;
+		}
+
+		function countHoliday(calendar, days){
+			console.log(calendar);
+			str = [];
+			calendarHoliday = calendar["response"]["holidays"];
+			calendarHoliday.forEach(function(holiday){
+				for (i = 0; i < 365; i++){
+					if (readDate(holiday["date"]["iso"]) == days[i]["date"]){
+						days[i]["value"]++;
+					}
+				}
+			})
+			console.log(days);
+			str = JSON.stringify(days);
+			document.getElementById("data").innerHTML = str;
+			return days
+		}
+
+
+		// function countHoliday(calendar, days){
+		// 	console.log(calendar);
+		// 	str = [];
+		// 	calendarHoliday = calendar["response"]["holidays"];
+
+		// 	calendarHoliday.forEach(function(holiday){
+		// 		// console.log(holiday);
+		// 		str += "<div class = 'holiday'><strong>Name: </strong>"
+		// 			+ holiday["name"]
+		// 			+ "<br>" 
+		// 			+ "<strong>Country: </strong>"
+		// 			+ holiday["country"]["name"]
+		// 			+ "<br>"
+		// 			+ "<strong>Description: </strong>"
+		// 			+ holiday["description"]
+		// 			+ "<br><br></div>";
+		// 	})
+		// 	// console.log(str)
+		// 	document.getElementById("data").innerHTML = str;
+
+		// 	return days
+		// }
+
+		function getDay(){
+			var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1;
+			var yyyy = today.getFullYear();
+			str = "https://calendarific.com/api/v2/holidays?&api_key=357daa714da539518e3389610b4b8e8fbcd2ac33&country=US&year=2019" ;
+			// str = "https://calendarific.com/api/v2/holidays?&api_key=357daa714da539518e3389610b4b8e8fbcd2ac33&country=US&year=" + yyyy + "&month=" + mm + "&day=" + dd;
+			writeDate();
+			return str;
+		}
+
+		function writeDate(){
+			var today = new Date();
+			var dd = String(today.getDate()).padStart(2, '0');
+			var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+			var yyyy = today.getFullYear();
+
+			today = mm + '/' + dd + '/' + yyyy;
+			document.getElementById("date").innerHTML = today; 
+		}
+	</script>
+
+
+
+
+
+
+	<style>
+		body {
+			width: 70%;
+			margin-left:10%;
+			font-family: 'Courier New', Courier, monospace;
+		}
+
+		h1 {
+			text-decoration: underline;
+			margin: 1%;
+		}
+
+		.holiday {
+			border: 3px solid #000;
+			margin: 1%;
+			padding: 1%;
+			font-size: 20px;
+		}
+
+		#date {
+			margin: 1%;
+			
+		}
+
+		svg {
+        height: 1800;
+        width: 97%;
+      }
+		
+	</style>
+</head>
+
+
+<body onload="getHoliday()">
+
+	<h1>Holidays Today</h1>
+	<div id = "date"></div>
+
+	<div id="data">Loading...</div>
+	<br>
+	<br>
+	<br>
+	<br>
+	
+	
+	<div class = "holiday">
+		<h3>API</h3>
+		<p><a href = "https://calendarific.com/">https://calendarific.com/</a></p>
+		<h3>Purpose</h3>
+		<p>This API is used for searching for the holiday which it allows the user to set the years, months, and days, as well as the nations and languages and find all the holidays with satisfy the setting</p>
+		<h3>API Request</h3>
+		<p>In this website, it will automatically read the today's date and set the options of api including the years, monthes, and days, and then, it will send the request to the api to find the holiday(s) of today.</p>
+		<h3>Optential Uses</h3>
+		<ul>
+			<li>This can be used in some navigation pages which adds more elements of interaction design from the web and the users</li>
+			<li>This can also be used in some "New tab" pages. For example, the page of google will display the event of this day within the design of their LOGO (although not every day). In women's day or in earth's day, they will replace their basic LOGO with the illustration of that event. In some way, this "Holidays Today" is similar with that, but Google's page absolutely adds more design and illustration within it. </li>
+		</ul>
+	</div>
+	
+</body>
+</html>
